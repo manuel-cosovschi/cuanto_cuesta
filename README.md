@@ -1,8 +1,13 @@
 # Cuánto Cuesta Argentina
 
-Guía editorial argentina con rangos estimativos de costos, tablas y calculadoras
-simples. MVP enfocado en la categoría **Autos**, preparado para escalar a
-vivienda, trámites, mascotas, viajes y más.
+> Guía editorial argentina con rangos estimativos de costos, tablas y calculadoras
+> simples. MVP enfocado en la categoría **Autos**, preparado para escalar a
+> vivienda, construcción, mascotas, trámites, viajes, tecnología, fitness,
+> estudios y emprendimientos.
+
+Estado actual: MVP funcional listo para deploy en Vercel. Build, lint, tests y
+typecheck pasan. AdSense queda preparado pero sin renderizar anuncios hasta
+contar con un client ID real.
 
 ## Stack
 
