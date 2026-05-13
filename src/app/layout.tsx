@@ -5,9 +5,18 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { AdSenseScript } from "@/components/ads/AdSenseScript";
 import { OrganizationJsonLd, WebsiteJsonLd } from "@/components/seo/JsonLd";
 import { defaultMetadata } from "@/lib/seo";
+import { ADSENSE_CLIENT_ID } from "@/lib/constants";
 import "./globals.css";
 
-export const metadata: Metadata = defaultMetadata;
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  other: ADSENSE_CLIENT_ID
+    ? {
+        // Verificación de propiedad para Google AdSense.
+        "google-adsense-account": ADSENSE_CLIENT_ID,
+      }
+    : undefined,
+};
 
 export const viewport: Viewport = {
   width: "device-width",

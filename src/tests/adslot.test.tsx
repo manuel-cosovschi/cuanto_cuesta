@@ -23,30 +23,40 @@ describe("AdSlot", () => {
     }
   });
 
-  it("no renderiza nada en producción cuando no hay client ID", async () => {
+  it("no renderiza nada en producción cuando el slot es placeholder (no numérico)", async () => {
     setNodeEnv("production");
-    delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-3376595991418457";
     const { AdSlot } = await import("@/components/ads/AdSlot");
-    const { container } = render(<AdSlot slot="any-slot" />);
+    const { container } = render(<AdSlot slot="home-bottom" />);
     expect(container.firstChild).toBeNull();
   });
 
-  it("renderiza placeholder de desarrollo cuando no hay client ID", async () => {
+  it("renderiza placeholder de desarrollo con slot placeholder", async () => {
     setNodeEnv("development");
-    delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-3376595991418457";
     const { AdSlot } = await import("@/components/ads/AdSlot");
-    const { container, getByText } = render(<AdSlot slot="dev-slot" />);
+    const { container, getByText } = render(<AdSlot slot="home-bottom" />);
     expect(container.firstChild).not.toBeNull();
     expect(getByText(/Slot publicitario/i)).toBeTruthy();
   });
 
-  it("renderiza el bloque adsbygoogle cuando hay client ID + slot", async () => {
+  it("renderiza el bloque adsbygoogle cuando el slot es numérico", async () => {
     setNodeEnv("production");
-    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-0000000000000000";
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-3376595991418457";
     const { AdSlot } = await import("@/components/ads/AdSlot");
     const { container } = render(<AdSlot slot="1234567890" />);
     const ins = container.querySelector("ins.adsbygoogle");
     expect(ins).not.toBeNull();
     expect(ins?.getAttribute("data-ad-slot")).toBe("1234567890");
+    expect(ins?.getAttribute("data-ad-client")).toBe("ca-pub-3376595991418457");
+  });
+
+  it("override de NEXT_PUBLIC_ADSENSE_CLIENT_ID gana sobre el default hardcodeado", async () => {
+    setNodeEnv("production");
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = "ca-pub-9999999999999999";
+    const { AdSlot } = await import("@/components/ads/AdSlot");
+    const { container } = render(<AdSlot slot="1234567890" />);
+    const ins = container.querySelector("ins.adsbygoogle");
+    expect(ins?.getAttribute("data-ad-client")).toBe("ca-pub-9999999999999999");
   });
 });
