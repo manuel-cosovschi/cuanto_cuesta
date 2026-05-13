@@ -16,7 +16,14 @@ interface AdSlotProps {
 /**
  * Contenedor para anuncios de AdSense. Reserva espacio para evitar CLS y
  * solo renderiza el bloque real cuando hay client ID y slot configurados.
- * Mientras tanto muestra un placeholder discreto solo en desarrollo.
+ *
+ * - Producción + sin client ID/slot → no renderiza absolutamente nada.
+ *   Esto evita mostrar contenedores vacíos con la palabra "Anuncio" cuando
+ *   no hay AdSense activo.
+ * - Desarrollo + sin client ID/slot → placeholder discreto para visualizar
+ *   la ubicación al diseñar.
+ * - Producción + client ID + slot → bloque `<ins class="adsbygoogle">`
+ *   etiquetado como "Anuncio".
  *
  * Importante: nunca incentivamos clics. La etiqueta visible es siempre "Anuncio".
  */
@@ -31,18 +38,22 @@ export function AdSlot({
   const hasSlot = Boolean(slot);
   const isProd = process.env.NODE_ENV === "production";
 
-  return (
-    <aside
-      role="complementary"
-      aria-label={label}
-      className={`my-6 rounded-md border border-dashed border-ink-200 bg-white p-2 ${className}`}
-    >
-      <p className="mb-1 text-center text-[10px] uppercase tracking-widest text-ink-500">
-        {label}
-      </p>
+  // En producción sin configuración real, no renderizamos nada para no mostrar
+  // contenedores vacíos al usuario.
+  if (isProd && (!hasClient || !hasSlot)) {
+    return null;
+  }
 
-      {hasClient && hasSlot ? (
-        // Renderizado real solo cuando hay ID + slot configurados.
+  if (hasClient && hasSlot) {
+    return (
+      <aside
+        role="complementary"
+        aria-label={label}
+        className={`my-6 rounded-md border border-dashed border-ink-200 bg-white p-2 ${className}`}
+      >
+        <p className="mb-1 text-center text-[10px] uppercase tracking-widest text-ink-500">
+          {label}
+        </p>
         <ins
           className="adsbygoogle ad-reserve block"
           style={{ display: "block" }}
@@ -51,12 +62,23 @@ export function AdSlot({
           data-ad-format={format}
           data-full-width-responsive={responsive ? "true" : "false"}
         />
-      ) : (
-        // Sin ID/slot: placeholder discreto solo en desarrollo, vacío en prod.
-        <div className="ad-reserve flex items-center justify-center rounded-sm bg-ink-50 text-xs text-ink-500">
-          {isProd ? "" : "Espacio reservado para anuncio (no se mostrará en prod sin ID)"}
-        </div>
-      )}
+      </aside>
+    );
+  }
+
+  // Desarrollo sin configuración: placeholder claramente identificado como
+  // herramienta interna de diseño, no como anuncio real.
+  return (
+    <aside
+      aria-hidden
+      className={`my-6 rounded-md border border-dashed border-ink-300 bg-ink-50 p-2 ${className}`}
+    >
+      <p className="mb-1 text-center text-[10px] uppercase tracking-widest text-ink-500">
+        Slot publicitario (solo en dev)
+      </p>
+      <div className="ad-reserve flex items-center justify-center rounded-sm text-xs text-ink-500">
+        Espacio reservado. No se muestra en producción sin client ID y slot reales.
+      </div>
     </aside>
   );
 }

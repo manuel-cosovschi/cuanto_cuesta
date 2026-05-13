@@ -1,3 +1,21 @@
+function resolveSiteUrl(): string {
+  // 1) Si el operador definió explícitamente NEXT_PUBLIC_SITE_URL, ganamos.
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  // 2) Si estamos corriendo en Vercel, usar la URL stable de producción del
+  //    proyecto. Esto evita que canonicals/sitemap/robots apunten al
+  //    placeholder cuando todavía no se compró un dominio propio.
+  //    Importante: VERCEL_PROJECT_PRODUCTION_URL solo está disponible en
+  //    server-side. Como SITE_URL se consume desde metadata/sitemap/robots/
+  //    JSON-LD (todos server), está OK.
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+
+  // 3) Fallback de desarrollo / placeholder.
+  return "https://cuantocuestaargentina.com";
+}
+
 export const SITE_NAME = "Cuánto Cuesta Argentina";
 export const SITE_SHORT_NAME = "Cuánto Cuesta AR";
 export const SITE_TAGLINE =
@@ -7,9 +25,7 @@ export const SITE_DESCRIPTION =
 export const SITE_LOCALE = "es_AR";
 export const SITE_COUNTRY = "Argentina";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://cuantocuestaargentina.com";
+export const SITE_URL = resolveSiteUrl();
 
 export const CONTACT_EMAIL = "contacto@cuantocuestaargentina.com";
 
