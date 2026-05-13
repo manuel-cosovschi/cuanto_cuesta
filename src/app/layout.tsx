@@ -28,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-AR">
       <head>
+        <AdSenseScript />
         <OrganizationJsonLd />
         <WebsiteJsonLd />
       </head>
@@ -36,7 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         {children}
         <Footer />
-        <AdSenseScript />
       </body>
     </html>
   );
