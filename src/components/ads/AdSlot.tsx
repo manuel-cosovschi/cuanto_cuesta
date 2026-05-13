@@ -1,7 +1,7 @@
 import { ADSENSE_CLIENT_ID } from "@/lib/constants";
 
 interface AdSlotProps {
-  /** ID del slot configurado en AdSense. */
+  /** ID del slot configurado en AdSense (numérico). */
   slot?: string;
   /** Formato AdSense ("auto", "rectangle", etc.). */
   format?: string;
@@ -13,17 +13,23 @@ interface AdSlotProps {
   label?: string;
 }
 
+/** Un slot AdSense real es una cadena numérica. Si es un placeholder
+ *  (p.ej. "home-bottom") devolvemos false y no renderizamos el <ins>. */
+function isRealAdSenseSlot(slot: string | undefined): slot is string {
+  return Boolean(slot && /^\d{6,}$/.test(slot));
+}
+
 /**
  * Contenedor para anuncios de AdSense. Reserva espacio para evitar CLS y
- * solo renderiza el bloque real cuando hay client ID y slot configurados.
+ * solo renderiza el bloque real cuando el slot es un ID numérico de AdSense.
  *
- * - Producción + sin client ID/slot → no renderiza absolutamente nada.
- *   Esto evita mostrar contenedores vacíos con la palabra "Anuncio" cuando
- *   no hay AdSense activo.
- * - Desarrollo + sin client ID/slot → placeholder discreto para visualizar
- *   la ubicación al diseñar.
- * - Producción + client ID + slot → bloque `<ins class="adsbygoogle">`
- *   etiquetado como "Anuncio".
+ * - Slot real (numérico) + client ID → bloque `<ins class="adsbygoogle">`
+ *   etiquetado como "Anuncio". AdSense lo llena cuando el sitio está aprobado.
+ * - Slot placeholder (string interno como "home-bottom") en producción →
+ *   no renderiza nada. Estos slots viven en el código como marcadores de
+ *   ubicación hasta que se creen las unidades reales en el panel de AdSense.
+ * - Desarrollo con slot placeholder → muestra un placeholder visual para
+ *   ver dónde van los ads al diseñar.
  *
  * Importante: nunca incentivamos clics. La etiqueta visible es siempre "Anuncio".
  */
@@ -35,16 +41,15 @@ export function AdSlot({
   label = "Anuncio",
 }: AdSlotProps) {
   const hasClient = Boolean(ADSENSE_CLIENT_ID);
-  const hasSlot = Boolean(slot);
+  const isRealSlot = isRealAdSenseSlot(slot);
   const isProd = process.env.NODE_ENV === "production";
 
-  // En producción sin configuración real, no renderizamos nada para no mostrar
-  // contenedores vacíos al usuario.
-  if (isProd && (!hasClient || !hasSlot)) {
+  // Producción: solo renderizamos cuando hay client ID Y slot real.
+  if (isProd && (!hasClient || !isRealSlot)) {
     return null;
   }
 
-  if (hasClient && hasSlot) {
+  if (hasClient && isRealSlot) {
     return (
       <aside
         role="complementary"
@@ -66,8 +71,7 @@ export function AdSlot({
     );
   }
 
-  // Desarrollo sin configuración: placeholder claramente identificado como
-  // herramienta interna de diseño, no como anuncio real.
+  // Desarrollo con slot placeholder: visual de diseño, no anuncio real.
   return (
     <aside
       aria-hidden
@@ -77,7 +81,7 @@ export function AdSlot({
         Slot publicitario (solo en dev)
       </p>
       <div className="ad-reserve flex items-center justify-center rounded-sm text-xs text-ink-500">
-        Espacio reservado. No se muestra en producción sin client ID y slot reales.
+        Slot: {slot || "no configurado"}. Reemplazar por el ID numérico real cuando AdSense apruebe el sitio.
       </div>
     </aside>
   );

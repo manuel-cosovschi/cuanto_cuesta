@@ -31,7 +31,13 @@ export const CONTACT_EMAIL = "contacto@cuantocuestaargentina.com";
 
 export const ORG_LEGAL_NAME = "Cuánto Cuesta Argentina";
 
-export const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "";
+// Google AdSense Publisher ID. No es un secreto: AdSense lo expone públicamente
+// en el <script> de cualquier sitio aprobado. Lo dejamos hardcodeado como default
+// para no depender de variables de entorno; igual se puede overridear con
+// NEXT_PUBLIC_ADSENSE_CLIENT_ID si en algún momento querés rotarlo.
+export const ADSENSE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim() ||
+  "ca-pub-3376595991418457";
 
 export const ANALYTICS_PROVIDER =
   (process.env.NEXT_PUBLIC_ANALYTICS_PROVIDER as
