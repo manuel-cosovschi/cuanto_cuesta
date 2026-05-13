@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
+import { AdDisclosure } from "@/components/ads/AdDisclosure";
 
 const cols: Array<{ title: string; links: Array<{ href: string; label: string }> }> = [
   {
@@ -58,8 +59,11 @@ export function Footer() {
         ))}
       </div>
       <div className="border-t border-ink-200">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-ink-500 sm:px-6">
-          © {year} {SITE_NAME}. Todos los precios son estimativos y de referencia.
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-4 text-xs text-ink-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <span>
+            © {year} {SITE_NAME}. Todos los precios son estimativos y de referencia.
+          </span>
+          <AdDisclosure />
         </div>
       </div>
     </footer>
