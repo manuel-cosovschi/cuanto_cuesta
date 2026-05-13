@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reserva de espacio para AdSlot para evitar CLS cuando el ad real cargue */
+.ad-reserve {
+  min-height: 90px;
+}
+
+.prose-cc h2 {
+  @apply text-2xl font-semibold mt-10 mb-3 text-ink-900;
+}
+.prose-cc h3 {
+  @apply text-xl font-semibold mt-6 mb-2 text-ink-900;
+}
+.prose-cc p {
+  @apply text-ink-700 leading-relaxed my-3;
+}
+.prose-cc ul {
+  @apply list-disc pl-6 space-y-1 my-3 text-ink-700;
+}
+.prose-cc table {
+  @apply w-full text-sm border-collapse my-4;
+}
+.prose-cc th,
+.prose-cc td {
+  @apply border border-ink-200 px-3 py-2 text-left align-top;
+}
+.prose-cc th {
+  @apply bg-ink-50 font-semibold;
+}
